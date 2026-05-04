@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Steam Motor Gian - Cuci Motor Profesional Cianjur</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+    body { font-family: 'Poppins', sans-serif; }
+ .gradient-bg { background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <!-- Navbar -->
+  <nav class="gradient-bg text-white shadow-lg sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="flex justify-between items-center py-4">
+        <a href="index.html" class="flex items-center gap-3">
+          <i class="fa-solid fa-motorcycle text-2xl"></i>
+          <h1 class="text-xl md:text-2xl font-bold">SteamMotor Gian</h1>
+        </a>
+        <!-- Menu Desktop -->
+        <div class="hidden md:flex gap-6 font-medium">
+          <a href="index.html" class="text-yellow-300 font-bold">Home</a>
+          <a href="layanan.html" class="hover:text-yellow-300 transition">Layanan</a>
+          <a href="booking.html" class="hover:text-yellow-300 transition">Booking</a>
+          <a href="cekstatus.html" class="hover:text-yellow-300 transition">Cek Status</a>
+        </div>
+        <!-- Hamburger Mobile -->
+        <button id="btnMenu" class="md:hidden text-2xl">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+      <!-- Menu Mobile -->
+      <div id="menuMobile" class="hidden md:hidden pb-4 space-y-3">
+        <a href="index.html" class="block text-yellow-300 font-bold">Home</a>
+        <a href="layanan.html" class="block hover:text-yellow-300">Layanan</a>
+        <a href="booking.html" class="block hover:text-yellow-300">Booking</a>
+        <a href="cekstatus.html" class="block hover:text-yellow-300">Cek Status</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero + Tentang Lengkap -->
+  <section class="gradient-bg text-white px-4 min-h-screen">
+    <div class="max-w-6xl mx-auto py-20">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl md:text-6xl font-bold mb-4 leading-tight">Selamat Datang di SteamMotor Gian</h2>
+        <p class="text-xl opacity-90 max-w-3xl mx-auto">Solusi cuci motor profesional #1 di Cianjur. Cepat, bersih, bergaransi.</p>
+      </div>
+
+      <!-- Tentang Kami Lengkap -->
+      <div class="bg-white/10 backdrop-blur-sm p-8 md:p-12 rounded-2xl">
+        <h3 class="text-3xl font-bold mb-6 text-center">Tentang SteamMotor Gian</h3>
+        <div class="space-y-6 text-lg leading-relaxed opacity-95">
+          <p>
+            <b>SteamMotor Gian</b> didirikan pada tahun 2023 dengan visi menjadi bengkel cuci motor terpercaya di Cianjur. Berawal dari kecintaan kami terhadap otomotif, kami sadar bahwa motor yang bersih bukan hanya soal penampilan, tapi juga soal perawatan jangka panjang.
+          </p>
+          <p>
+            Kami menggunakan <b>shampoo khusus motor ber-pH seimbang</b> yang aman untuk cat dan tidak membuat kusam. Dilengkapi dengan mesin steam tekanan tinggi dan semir ban premium, motor Anda dijamin kinclong seperti baru keluar dealer.
+          </p>
+          <p>
+            Tim kami terdiri dari 10+ teknisi berpengalaman yang terlatih untuk menangani semua jenis motor, dari matic, bebek, hingga sport. Proses pengerjaan hanya <b>10-15 menit</b> tanpa mengurangi kualitas hasil cucian.
+          </p>
+          <p>
+            <b>Garansi Kepuasan 100%</b>: Jika Anda merasa masih ada bagian yang kurang bersih, kami akan cuci ulang tanpa biaya tambahan. Kepuasan Anda adalah kebanggaan kami.
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-6 my-10">
+          <div class="bg-white/20 p-6 rounded-xl text-center">
+            <i class="fa-solid fa-bolt text-3xl mb-3 text-yellow-300"></i>
+            <h4 class="text-lg font-bold mb-2">15 Menit Selesai</h4>
+            <p class="text-sm opacity-90">Tanpa antri lama dengan sistem booking</p>
+          </div>
+          <div class="bg-white/20 p-6 rounded-xl text-center">
+            <i class="fa-solid fa-shield-heart text-3xl mb-3 text-yellow-300"></i>
+            <h4 class="text-lg font-bold mb-2">Bahan Premium</h4>
+            <p class="text-sm opacity-90">Shampoo khusus + Semir ban anti retak</p>
+          </div>
+          <div class="bg-white/20 p-6 rounded-xl text-center">
+            <i class="fa-solid fa-users text-3xl mb-3 text-yellow-300"></i>
+            <h4 class="text-lg font-bold mb-2">5000+ Pelanggan</h4>
+            <p class="text-sm opacity-90">Dipercaya ribuan bikers Cianjur</p>
+          </div>
+        </div>
+
+        <div class="border-t border-white/30 pt-6 grid md:grid-cols-2 gap-6">
+          <div>
+            <p class="font-semibold text-xl mb-2"><i class="fa-solid fa-clock mr-2"></i>Jam Operasional</p>
+            <p class="opacity-90">Senin - Minggu: 08.00 - 20.00 WIB</p>
+            <p class="opacity-90 text-sm mt-1">Buka setiap hari, kecuali kiamat!!</p>
+          </div>
+          <div>
+            <p class="font-semibold text-xl mb-2"><i class="fa-solid fa-location-dot mr-2"></i>Lokasi Bengkel</p>
+            <p class="opacity-90">Jl. Raya Cianjur No. 666, Cianjur, Jawa Barat</p>
+            <p class="opacity-90 text-sm mt-1">Patokan: Sebelah Alfamart Cianjur Kota</p>
+          </div>
+        </div>
+
+        <div class="text-center mt-10">
+          <a href="booking.html" class="bg-yellow-400 text-gray-900 px-8 py-4 rounded-full font-semibold hover:bg-yellow-300 transition text-lg">
+            <i class="fa-solid fa-calendar-check mr-2"></i>Booking Sekarang
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-gray-800 text-white py-8 px-4">
+    <div class="max-w-6xl mx-auto text-center">
+      <p class="mb-2"><i class="fa-solid fa-motorcycle mr-2"></i><b>SteamMotor Gian</b></p>
+      <p class="mb-2"><i class="fa-brands fa-whatsapp"></i> 0823-1051-****</p>
+      <p class="opacity-75 text-sm">© 2026 SteamMotor Gian. Cuci Motor No. 1 di Cianjur.</p>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('btnMenu').onclick = () => {
+      document.getElementById('menuMobile').classList.toggle('hidden');
+    };
+  </script>
+</body>
+</html>

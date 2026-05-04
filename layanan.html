@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Layanan - SteamMotor Gian</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+    body { font-family: 'Poppins', sans-serif; }
+ .gradient-bg { background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); }
+ .card-hover { transition: all 0.3s ease; }
+ .card-hover:hover { transform: translateY(-8px); box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1); }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <nav class="gradient-bg text-white shadow-lg sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="flex justify-between items-center py-4">
+        <a href="index.html" class="flex items-center gap-3">
+          <i class="fa-solid fa-motorcycle text-2xl"></i>
+          <h1 class="text-xl md:text-2xl font-bold">SteamMotor Gian</h1>
+        </a>
+        <div class="hidden md:flex gap-6 font-medium">
+          <a href="index.html" class="hover:text-yellow-300 transition">Home</a>
+          <a href="layanan.html" class="text-yellow-300 font-bold">Layanan</a>
+          <a href="booking.html" class="hover:text-yellow-300 transition">Booking</a>
+          <a href="cekstatus.html" class="hover:text-yellow-300 transition">Cek Status</a>
+        </div>
+        <button id="btnMenu" class="md:hidden text-2xl"><i class="fa-solid fa-bars"></i></button>
+      </div>
+      <div id="menuMobile" class="hidden md:hidden pb-4 space-y-3">
+        <a href="index.html" class="block hover:text-yellow-300">Home</a>
+        <a href="layanan.html" class="block text-yellow-300 font-bold">Layanan</a>
+        <a href="booking.html" class="block hover:text-yellow-300">Booking</a>
+        <a href="cekstatus.html" class="block hover:text-yellow-300">Cek Status</a>
+      </div>
+    </div>
+  </nav>
+
+  <section class="py-20 px-4 bg-white min-h-screen">
+    <div class="max-w-6xl mx-auto">
+      <h3 class="text-4xl font-bold text-center mb-3 text-gray-800">Paket Layanan Kami</h3>
+      <p class="text-center text-gray-600 mb-12">Harga sudah termasuk sabun salju & semir ban. Pilih sesuai kebutuhan motor kamu.</p>
+      <div id="layananList" class="grid md:grid-cols-3 gap-8">
+        <p class="col-span-3 text-center text-gray-500">Memuat layanan...</p>
+      </div>
+      <div class="text-center mt-12">
+        <a href="booking.html" class="gradient-bg text-white px-8 py-4 rounded-full font-semibold hover:opacity-90 transition text-lg">
+          Lanjut ke Booking <i class="fa-solid fa-arrow-right ml-2"></i>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="bg-gray-800 text-white py-8 px-4">
+    <div class="max-w-6xl mx-auto text-center">
+      <p class="opacity-75 text-sm">© 2026 SteamMotor Gian.</p>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getDatabase, ref, onValue, query, orderByChild } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBc_urjkvX2Ymx-_ol1UoklF2Np96Pfl-4",
+      authDomain: "steammotorgian.firebaseapp.com",
+      projectId: "steammotorgian",
+      storageBucket: "steammotorgian.firebasestorage.app",
+      messagingSenderId: "352418839330",
+      appId: "1:352418839330:web:3fa6d5cd296ec92a06437b",
+      measurementId: "G-P6KB2HH388"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    document.getElementById('btnMenu').onclick = () => {
+      document.getElementById('menuMobile').classList.toggle('hidden');
+    };
+
+    const layananQuery = query(ref(db, 'layanan/'), orderByChild('harga'));
+    onValue(layananQuery, (snapshot) => {
+      const data = snapshot.val();
+      const layananList = document.getElementById('layananList');
+      layananList.innerHTML = '';
+
+      if(data && Object.keys(data).length > 0) {
+        const items = Object.entries(data);
+        items.forEach(([id, item], index) => {
+          const isPopular = items.length >= 3 && index === 1;
+          layananList.innerHTML += `
+            <div class="bg-gray-50 p-6 rounded-2xl shadow-lg card-hover text-center relative ${isPopular? 'border-2 border-blue-500' : ''}">
+              ${isPopular? '<span class="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-semibold">Terlaris</span>' : ''}
+              <div class="text-5xl mb-4">${item.icon || '🏍️'}</div>
+              <h4 class="text-xl font-bold mb-2">${item.nama}</h4>
+              <p class="text-gray-600 mb-4">${item.deskripsi}</p>
+              <p class="text-3xl font-bold text-blue-600">Rp ${item.harga.toLocaleString('id-ID')}</p>
+            </div>`;
+        });
+      } else {
+        layananList.innerHTML = '<p class="col-span-3 text-center text-gray-500">Belum ada layanan tersedia.</p>';
+      }
+    });
+  </script>
+</body>
+</html>

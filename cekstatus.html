@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cek Status - SteamMotor Gian</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+    body { font-family: 'Poppins', sans-serif; }
+ .gradient-bg { background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <nav class="gradient-bg text-white shadow-lg sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="flex justify-between items-center py-4">
+        <a href="index.html" class="flex items-center gap-3">
+          <i class="fa-solid fa-motorcycle text-2xl"></i>
+          <h1 class="text-xl md:text-2xl font-bold">SteamMotor Gian</h1>
+        </a>
+        <div class="hidden md:flex gap-6 font-medium">
+          <a href="index.html" class="hover:text-yellow-300 transition">Home</a>
+          <a href="layanan.html" class="hover:text-yellow-300 transition">Layanan</a>
+          <a href="booking.html" class="hover:text-yellow-300 transition">Booking</a>
+          <a href="cekstatus.html" class="text-yellow-300 font-bold">Cek Status</a>
+        </div>
+        <button id="btnMenu" class="md:hidden text-2xl"><i class="fa-solid fa-bars"></i></button>
+      </div>
+      <div id="menuMobile" class="hidden md:hidden pb-4 space-y-3">
+        <a href="index.html" class="block hover:text-yellow-300">Home</a>
+        <a href="layanan.html" class="block hover:text-yellow-300">Layanan</a>
+        <a href="booking.html" class="block hover:text-yellow-300">Booking</a>
+        <a href="cekstatus.html" class="block text-yellow-300 font-bold">Cek Status</a>
+      </div>
+    </div>
+  </nav>
+
+  <section class="py-20 px-4 min-h-screen">
+    <div class="max-w-2xl mx-auto">
+      <h3 class="text-4xl font-bold text-center mb-3 text-gray-800">Cek Status Booking</h3>
+      <p class="text-center text-gray-600 mb-8">Masukkan kode booking yang kamu dapat setelah submit form.</p>
+      <div class="bg-white p-8 rounded-2xl shadow-lg">
+        <div class="flex gap-3">
+          <input type="text" id="kodeBooking" placeholder="Contoh: SM123456" class="flex-1 px-4 py-3 rounded-lg border focus:ring-2 focus:ring-blue-500">
+          <button id="btnCek" class="gradient-bg text-white px-6 py-3 rounded-lg font-semibold">Cek</button>
+        </div>
+        <div id="hasilCek" class="mt-6"></div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="bg-gray-800 text-white py-8 px-4">
+    <div class="max-w-6xl mx-auto text-center">
+      <p class="opacity-75 text-sm">© 2026 SteamMotor Gian.</p>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBc_urjkvX2Ymx-_ol1UoklF2Np96Pfl-4",
+      authDomain: "steammotorgian.firebaseapp.com",
+      projectId: "steammotorgian",
+      storageBucket: "steammotorgian.firebasestorage.app",
+      messagingSenderId: "352418839330",
+      appId: "1:352418839330:web:3fa6d5cd296ec92a06437b",
+      measurementId: "G-P6KB2HH388"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    document.getElementById('btnMenu').onclick = () => {
+      document.getElementById('menuMobile').classList.toggle('hidden');
+    };
+
+    document.getElementById('btnCek').addEventListener('click', async () => {
+      const kode = document.getElementById('kodeBooking').value.trim().toUpperCase();
+      const hasilCek = document.getElementById('hasilCek');
+      if(!kode) return;
+
+      const snapshot = await get(ref(db, 'booking/'));
+      const data = snapshot.val();
+      let found = false;
+
+      if(data) {
+        Object.values(data).forEach(item => {
+          if(item.kode === kode) {
+            found = true;
+            const statusColor = { 'Menunggu': 'yellow', 'Dicuci': 'blue', 'Selesai': 'green', 'Batal': 'red' };
+            const statusIcon = { 'Menunggu': 'clock', 'Dicuci': 'spinner', 'Selesai': 'check-circle', 'Batal': 'xmark-circle' };
+            hasilCek.innerHTML = `
+              <div class="border-l-4 border-${statusColor[item.status]}-500 bg-${statusColor[item.status]}-50 p-4 rounded">
+                <p class="font-bold text-lg mb-2"><i class="fa-solid fa-${statusIcon[item.status]} mr-2"></i>Status: ${item.status}</p>
+                <p><b>Nama:</b> ${item.nama}</p>
+                <p><b>Motor:</b> ${item.motor} - ${item.plat}</p>
+                <p><b>Paket:</b> ${item.paketNama} - Rp ${item.harga.toLocaleString('id-ID')}</p>
+                <p><b>Jadwal:</b> ${item.tanggal} jam ${item.jam}</p>
+              </div>`;
+          }
+        });
+      }
+      if(!found) hasilCek.innerHTML = '<p class="text-red-500 text-center bg-red-50 p-4 rounded">Kode booking tidak ditemukan. Cek lagi kodenya.</p>';
+    });
+  </script>
+</body>
+</html>

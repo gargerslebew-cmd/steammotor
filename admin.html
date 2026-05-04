@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - SteamMotor Gian</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+    body { font-family: 'Poppins', sans-serif; }
+   .gradient-bg { background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); }
+   .tab-btn.active { background-color: #2563eb; color: white; }
+  </style>
+</head>
+<body class="bg-gray-100">
+  <!-- Login Page -->
+  <div id="loginPage" class="min-h-screen flex items-center justify-center gradient-bg px-4">
+    <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md">
+      <div class="text-center mb-8">
+        <i class="fa-solid fa-lock text-5xl text-blue-600 mb-4"></i>
+        <h2 class="text-3xl font-bold text-gray-800">Admin Login</h2>
+        <p class="text-gray-500">SteamMotor Gian Dashboard</p>
+      </div>
+      <form id="loginForm" class="space-y-5">
+        <input type="email" id="email" placeholder="Email Admin" required class="w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-blue-500">
+        <input type="password" id="password" placeholder="Password" required class="w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-blue-500">
+        <button type="submit" class="w-full gradient-bg text-white py-3 rounded-lg font-semibold hover:opacity-90">Login</button>
+        <p id="loginError" class="text-red-500 text-sm text-center hidden"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="dashboard" class="hidden">
+    <nav class="gradient-bg text-white shadow-lg">
+      <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+        <h1 class="text-2xl font-bold"><i class="fa-solid fa-gauge-high mr-2"></i>Admin Dashboard</h1>
+        <div class="flex items-center gap-4">
+          <span id="adminEmail" class="text-sm opacity-90"></span>
+          <button id="btnLogout" class="bg-red-500 px-4 py-2 rounded-lg hover:bg-red-600"><i class="fa-solid fa-right-from-bracket"></i></button>
+        </div>
+      </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto p-4 md:p-8">
+      <div class="flex gap-2 mb-8 overflow-x-auto">
+        <button onclick="showTab('overview', this)" class="tab-btn bg-white px-6 py-2 rounded-lg">Dashboard</button>
+        <button onclick="showTab('booking', this)" class="tab-btn active bg-white px-6 py-2 rounded-lg">Booking</button>
+        <button onclick="showTab('layanan', this)" class="tab-btn bg-white px-6 py-2 rounded-lg">Layanan</button>
+        <button onclick="showTab('admin', this)" class="tab-btn bg-white px-6 py-2 rounded-lg">Kelola Admin</button>
+      </div>
+
+      <!-- Tab: Overview -->
+      <div id="tab-overview" class="tab-content hidden">
+        <div class="grid md:grid-cols-4 gap-6 mb-8">
+          <div class="bg-white p-6 rounded-xl shadow">
+            <p class="text-gray-500 text-sm">Total Pendapatan</p>
+            <p class="text-3xl font-bold text-green-600" id="totalPendapatan">Rp 0</p>
+          </div>
+          <div class="bg-white p-6 rounded-xl shadow">
+            <p class="text-gray-500 text-sm">Total Booking</p>
+            <p class="text-3xl font-bold text-blue-600" id="totalBooking">0</p>
+          </div>
+          <div class="bg-white p-6 rounded-xl shadow">
+            <p class="text-gray-500 text-sm">Booking Hari Ini</p>
+            <p class="text-3xl font-bold text-yellow-600" id="bookingHariIni">0</p>
+          </div>
+          <div class="bg-white p-6 rounded-xl shadow">
+            <p class="text-gray-500 text-sm">Menunggu</p>
+            <p class="text-3xl font-bold text-red-600" id="bookingMenunggu">0</p>
+          </div>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow">
+          <h3 class="text-xl font-bold mb-4">Grafik Booking 7 Hari Terakhir</h3>
+          <canvas id="chartBooking"></canvas>
+        </div>
+      </div>
+
+      <!-- Tab: Booking -->
+      <div id="tab-booking" class="tab-content">
+        <div class="bg-white p-6 rounded-xl shadow">
+          <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-bold">Data Booking</h3>
+            <button onclick="exportCSV()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+              <i class="fa-solid fa-file-csv mr-2"></i>Export CSV
+            </button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="p-3 text-left">Kode</th>
+                  <th class="p-3 text-left">Nama</th>
+                  <th class="p-3 text-left">Motor</th>
+                  <th class="p-3 text-left">Paket</th>
+                  <th class="p-3 text-left">Jadwal</th>
+                  <th class="p-3 text-left">Status</th>
+                  <th class="p-3 text-left">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="bookingTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab: Layanan -->
+      <div id="tab-layanan" class="tab-content hidden">
+        <div class="grid md:grid-cols-2 gap-6">
+          <div class="bg-white p-6 rounded-xl shadow">
+            <h3 class="text-xl font-bold mb-4">Tambah Layanan Baru</h3>
+            <form id="formLayanan" class="space-y-4">
+              <input type="text" id="namaLayanan" placeholder="Nama Paket: Cuci Premium" required class="w-full px-4 py-2 rounded-lg border">
+              <input type="text" id="iconLayanan" placeholder="Emoji Icon: 🚿" class="w-full px-4 py-2 rounded-lg border">
+              <textarea id="deskripsiLayanan" placeholder="Deskripsi: Cuci + Semir Ban + Pengkilap" required class="w-full px-4 py-2 rounded-lg border"></textarea>
+              <input type="number" id="hargaLayanan" placeholder="Harga: 25000" required class="w-full px-4 py-2 rounded-lg border">
+              <button type="submit" class="w-full gradient-bg text-white py-2 rounded-lg font-semibold">
+                <i class="fa-solid fa-plus mr-2"></i>Simpan Layanan
+              </button>
+            </form>
+          </div>
+          <div class="bg-white p-6 rounded-xl shadow">
+            <h3 class="text-xl font-bold mb-4">Daftar Layanan Aktif</h3>
+            <div id="listLayanan" class="space-y-3"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab: Admin -->
+      <div id="tab-admin" class="tab-content hidden">
+        <div class="bg-white p-6 rounded-xl shadow max-w-md">
+          <h3 class="text-xl font-bold mb-4">Tambah Admin Baru</h3>
+          <form id="formAdmin" class="space-y-4">
+            <input type="email" id="emailAdminBaru" placeholder="Email Admin Baru" required class="w-full px-4 py-2 rounded-lg border">
+            <input type="password" id="passwordAdminBaru" placeholder="Password" required class="w-full px-4 py-2 rounded-lg border">
+            <button type="submit" class="w-full gradient-bg text-white py-2 rounded-lg font-semibold">Buat Admin</button>
+            <p id="adminMsg" class="text-sm text-center"></p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getDatabase, ref, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBc_urjkvX2Ymx-_ol1UoklF2Np96Pfl-4",
+      authDomain: "steammotorgian.firebaseapp.com",
+      projectId: "steammotorgian",
+      storageBucket: "steammotorgian.firebasestorage.app",
+      messagingSenderId: "352418839330",
+      appId: "1:352418839330:web:3fa6d5cd296ec92a06437b",
+      measurementId: "G-P6KB2HH388"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+    let allBooking = {};
+    let chartInstance = null;
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        document.getElementById('loginPage').classList.add('hidden');
+        document.getElementById('dashboard').classList.remove('hidden');
+        document.getElementById('adminEmail').textContent = user.email;
+        loadData();
+      } else {
+        document.getElementById('loginPage').classList.remove('hidden');
+        document.getElementById('dashboard').classList.add('hidden');
+      }
+    });
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        document.getElementById('loginError').classList.add('hidden');
+      } catch (err) {
+        document.getElementById('loginError').textContent = 'Email atau password salah';
+        document.getElementById('loginError').classList.remove('hidden');
+      }
+    });
+
+    document.getElementById('btnLogout').onclick = () => signOut(auth);
+
+    function loadData() {
+      onValue(ref(db, 'booking/'), (snapshot) => {
+        const data = snapshot.val() || {};
+        allBooking = data;
+        updateDashboard(data);
+        updateBookingTable(data);
+      });
+
+      onValue(ref(db, 'layanan/'), (snapshot) => {
+        const data = snapshot.val() || {};
+        updateLayananList(data);
+      });
+    }
+
+    function updateDashboard(data) {
+      const today = new Date().toISOString().split('T')[0];
+      let total = 0, todayCount = 0, menunggu = 0;
+      const chartData = {};
+
+      Object.values(data).forEach(item => {
+        if(item.status === 'Selesai') total += item.harga || 0;
+        if(item.tanggal === today) todayCount++;
+        if(item.status === 'Menunggu') menunggu++;
+        const tgl = item.tanggal;
+        chartData[tgl] = (chartData[tgl] || 0) + 1;
+      });
+
+      document.getElementById('totalPendapatan').textContent = 'Rp ' + total.toLocaleString('id-ID');
+      document.getElementById('totalBooking').textContent = Object.keys(data).length;
+      document.getElementById('bookingHariIni').textContent = todayCount;
+      document.getElementById('bookingMenunggu').textContent = menunggu;
+
+      const last7Days = [...Array(7)].map((_, i) => {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        return d.toISOString().split('T')[0];
+      }).reverse();
+
+      if (chartInstance) chartInstance.destroy();
+      chartInstance = new Chart(document.getElementById('chartBooking'), {
+        type: 'line',
+        data: {
+          labels: last7Days,
+          datasets: [{
+            label: 'Booking',
+            data: last7Days.map(d => chartData[d] || 0),
+            borderColor: '#3b82f6',
+            tension: 0.4
+          }]
+        }
+      });
+    }
+
+    function updateBookingTable(data) {
+      const tbody = document.getElementById('bookingTable');
+      tbody.innerHTML = '';
+      if(Object.keys(data).length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-gray-500">Belum ada booking</td></tr>';
+        return;
+      }
+      const sortedData = Object.entries(data).sort((a,b) => b[1].timestamp - a[1].timestamp);
+      
+      sortedData.forEach(([id, item]) => {
+        const statusColor = { 'Menunggu': 'yellow', 'Proses': 'blue', 'Selesai': 'green', 'Batal': 'red' };
+        
+        let noWa = item.nohp.replace(/[^0-9]/g, '');
+        if (noWa.startsWith('0')) noWa = '62' + noWa.substring(1);
+        
+        const pesan = `Halo Kak ${item.nama} 👋\n\nMotor ${item.motor} (${item.plat}) dengan kode booking *${item.kode}* sudah *SELESAI* dicuci di SteamMotor Gian ✨\n\nSilakan diambil ya. Terima kasih sudah mempercayakan motor kesayangan ke kami 🙏\n\n*SteamMotor Gian*`;
+        const linkWa = `https://wa.me/${noWa}?text=${encodeURIComponent(pesan)}`;
+        
+        tbody.innerHTML += `
+          <tr class="border-b hover:bg-gray-50" data-id="${id}">
+            <td class="p-3 font-mono text-xs font-semibold">${item.kode}</td>
+            <td class="p-3">${item.nama}<br><span class="text-xs text-gray-500">${item.nohp}</span></td>
+            <td class="p-3">${item.motor}<br><span class="text-xs text-gray-500">${item.plat}</span></td>
+            <td class="p-3">${item.paketNama}<br><span class="text-xs text-gray-500">Rp ${item.harga.toLocaleString('id-ID')}</span></td>
+            <td class="p-3">${item.tanggal}<br><span class="text-xs text-gray-500">${item.jam}</span></td>
+            <td class="p-3">
+              <select data-id="${id}" class="status-select px-2 py-1 rounded text-xs bg-${statusColor[item.status]}-100 font-semibold">
+                <option value="Menunggu" ${item.status==='Menunggu'?'selected':''}>Menunggu</option>
+                <option value="Proses" ${item.status==='Proses'?'selected':''}>Proses</option>
+                <option value="Selesai" ${item.status==='Selesai'?'selected':''}>Selesai</option>
+                <option value="Batal" ${item.status==='Batal'?'selected':''}>Batal</option>
+              </select>
+            </td>
+            <td class="p-3">
+              <div class="flex gap-2">
+                ${item.status === 'Selesai'? `<a href="${linkWa}" target="_blank" class="text-green-600 hover:text-green-800" title="Kirim WA ke Customer"><i class="fa-brands fa-whatsapp text-lg"></i></a>` : ''}
+                <button onclick="hapusBooking('${id}')" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
+              </div>
+            </td>
+          </tr>`;
+      });
+
+      // Pasang event listener setelah render
+      document.querySelectorAll('.status-select').forEach(select => {
+        select.addEventListener('change', function() {
+          const id = this.dataset.id;
+          const status = this.value;
+          updateStatus(id, status);
+        });
+      });
+    }
+
+    window.updateStatus = (id, status) => {
+      const booking = allBooking[id];
+      update(ref(db, `booking/${id}`), { status: status });
+      
+      if (status === 'Selesai' && booking) {
+        let noWa = booking.nohp.replace(/[^0-9]/g, '');
+        if (noWa.startsWith('0')) noWa = '62' + noWa.substring(1);
+        
+        const pesan = `Halo Kak ${booking.nama} 👋\n\nMotor ${booking.motor} (${booking.plat}) dengan kode booking *${booking.kode}* sudah *SELESAI* dicuci di SteamMotor Gian ✨\n\nSilakan diambil ya. Terima kasih sudah mempercayakan motor kesayangan ke kami 🙏\n\n*SteamMotor Gian*`;
+        const linkWa = `https://wa.me/${noWa}?text=${encodeURIComponent(pesan)}`;
+        
+        if (confirm(`Status diubah jadi Selesai. Kirim WA ke ${booking.nama}?`)) {
+          window.open(linkWa, '_blank');
+        }
+      }
+    }
+
+    window.hapusBooking = (id) => { if(confirm('Hapus booking ini?')) remove(ref(db, `booking/${id}`)); }
+
+    document.getElementById('formLayanan').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      await push(ref(db, 'layanan/'), {
+        nama: document.getElementById('namaLayanan').value,
+        icon: document.getElementById('iconLayanan').value || '🏍️',
+        deskripsi: document.getElementById('deskripsiLayanan').value,
+        harga: parseInt(document.getElementById('hargaLayanan').value)
+      });
+      e.target.reset();
+      alert('Layanan berhasil ditambahkan!');
+    });
+
+    function updateLayananList(data) {
+      const list = document.getElementById('listLayanan');
+      list.innerHTML = '';
+      if(Object.keys(data).length === 0) {
+        list.innerHTML = '<p class="text-gray-500 text-center">Belum ada layanan. Tambahkan dulu.</p>';
+        return;
+      }
+      Object.entries(data).forEach(([id, item]) => {
+        list.innerHTML += `
+          <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+            <div>
+              <span class="text-2xl mr-2">${item.icon}</span>
+              <b>${item.nama}</b> - Rp ${item.harga.toLocaleString('id-ID')}
+              <p class="text-xs text-gray-500">${item.deskripsi}</p>
+            </div>
+            <button onclick="hapusLayanan('${id}')" class="text-red-500"><i class="fa-solid fa-trash"></i></button>
+          </div>`;
+      });
+    }
+    window.hapusLayanan = (id) => { if(confirm('Hapus layanan ini?')) remove(ref(db, `layanan/${id}`)); }
+
+    document.getElementById('formAdmin').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('emailAdminBaru').value;
+      const pass = document.getElementById('passwordAdminBaru').value;
+      const msg = document.getElementById('adminMsg');
+      try {
+        await createUserWithEmailAndPassword(auth, email, pass);
+        msg.textContent = 'Admin berhasil dibuat!';
+        msg.className = 'text-green-600 text-sm text-center';
+        e.target.reset();
+      } catch (err) {
+        msg.textContent = 'Gagal: ' + err.message;
+        msg.className = 'text-red-600 text-sm text-center';
+      }
+    });
+
+    window.exportCSV = () => {
+      let csv = 'Kode,Nama,No HP,Plat,Motor,Paket,Harga,Tanggal,Jam,Status\n';
+      Object.values(allBooking).forEach(i => {
+        csv += `${i.kode},${i.nama},${i.nohp},${i.plat},${i.motor},${i.paketNama},${i.harga},${i.tanggal},${i.jam},${i.status}\n`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `booking-steammotor-${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+    }
+
+    window.showTab = (tab, btn) => {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById(`tab-${tab}`).classList.remove('hidden');
+      btn.classList.add('active');
+    }
+  </script>
+</body>
+</html>

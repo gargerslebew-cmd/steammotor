@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Booking - SteamMotor Gian</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+    body { font-family: 'Poppins', sans-serif; }
+ .gradient-bg { background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <nav class="gradient-bg text-white shadow-lg sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="flex justify-between items-center py-4">
+        <a href="index.html" class="flex items-center gap-3">
+          <i class="fa-solid fa-motorcycle text-2xl"></i>
+          <h1 class="text-xl md:text-2xl font-bold">SteamMotor Gian</h1>
+        </a>
+        <div class="hidden md:flex gap-6 font-medium">
+          <a href="index.html" class="hover:text-yellow-300 transition">Home</a>
+          <a href="layanan.html" class="hover:text-yellow-300 transition">Layanan</a>
+          <a href="booking.html" class="text-yellow-300 font-bold">Booking</a>
+          <a href="cekstatus.html" class="hover:text-yellow-300 transition">Cek Status</a>
+        </div>
+        <button id="btnMenu" class="md:hidden text-2xl"><i class="fa-solid fa-bars"></i></button>
+      </div>
+      <div id="menuMobile" class="hidden md:hidden pb-4 space-y-3">
+        <a href="index.html" class="block hover:text-yellow-300">Home</a>
+        <a href="layanan.html" class="block hover:text-yellow-300">Layanan</a>
+        <a href="booking.html" class="block text-yellow-300 font-bold">Booking</a>
+        <a href="cekstatus.html" class="block hover:text-yellow-300">Cek Status</a>
+      </div>
+    </div>
+  </nav>
+
+  <section class="py-20 px-4 min-h-screen">
+    <div class="max-w-2xl mx-auto">
+      <h3 class="text-4xl font-bold text-center mb-3 text-gray-800">Form Booking Online</h3>
+      <p class="text-center text-gray-600 mb-8">Isi data lengkap. Kode booking akan muncul setelah submit.</p>
+      <form id="bookingForm" class="bg-white p-8 rounded-2xl shadow-lg space-y-5">
+        <div class="grid md:grid-cols-2 gap-5">
+          <input type="text" id="nama" placeholder="Nama Lengkap" required class="w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-blue-500">
+          <input type="tel" id="nohp" placeholder="No WhatsApp Aktif" required class="w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div class="grid md:grid-cols-2 gap-5">
+          <input type="text" id="plat" placeholder="Plat Nomor: F 1234 ABC" required class="w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-blue-500">
+          <input type="text" id="motor" placeholder="Jenis Motor: Beat, Vario, NMAX" required class="w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-blue-500">
+        </div>
+        <select id="paket" required class="w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-blue-500">
+          <option value="">Pilih Paket Layanan</option>
+        </select>
+        <div class="grid md:grid-cols-2 gap-5">
+          <input type="date" id="tanggal" required class="w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-blue-500">
+          <input type="time" id="jam" min="08:00" max="20:00" required class="w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-blue-500">
+        </div>
+        <button type="submit" class="w-full gradient-bg text-white py-3 rounded-lg font-semibold hover:opacity-90 transition">
+          <i class="fa-solid fa-calendar-check mr-2"></i>Konfirmasi Booking
+        </button>
+        <div id="hasilBooking" class="hidden p-4 bg-green-100 text-green-800 rounded-lg text-center"></div>
+      </form>
+    </div>
+  </section>
+
+  <footer class="bg-gray-800 text-white py-8 px-4">
+    <div class="max-w-6xl mx-auto text-center">
+      <p class="opacity-75 text-sm">© 2026 SteamMotor Gian.</p>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getDatabase, ref, push, onValue, query, orderByChild } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBc_urjkvX2Ymx-_ol1UoklF2Np96Pfl-4",
+      authDomain: "steammotorgian.firebaseapp.com",
+      projectId: "steammotorgian",
+      storageBucket: "steammotorgian.firebasestorage.app",
+      messagingSenderId: "352418839330",
+      appId: "1:352418839330:web:3fa6d5cd296ec92a06437b",
+      measurementId: "G-P6KB2HH388"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    document.getElementById('btnMenu').onclick = () => {
+      document.getElementById('menuMobile').classList.toggle('hidden');
+    };
+
+    // Load Layanan untuk Dropdown
+    const layananQuery = query(ref(db, 'layanan/'), orderByChild('harga'));
+    onValue(layananQuery, (snapshot) => {
+      const data = snapshot.val();
+      const paketSelect = document.getElementById('paket');
+      paketSelect.innerHTML = '<option value="">Pilih Paket Layanan</option>';
+      if(data) {
+        Object.entries(data).forEach(([id, item]) => {
+          paketSelect.innerHTML += `<option value="${id}" data-harga="${item.harga}">${item.nama} - Rp ${item.harga.toLocaleString('id-ID')}</option>`;
+        });
+      }
+    });
+
+    document.getElementById('bookingForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const paketOption = document.getElementById('paket').selectedOptions[0];
+      if(!paketOption.value) {
+        alert('Pilih paket layanan dulu!');
+        return;
+      }
+      const kode = 'SM' + Date.now().toString().slice(-6);
+
+      const bookingData = {
+        kode: kode,
+        nama: document.getElementById('nama').value,
+        nohp: document.getElementById('nohp').value,
+        plat: document.getElementById('plat').value,
+        motor: document.getElementById('motor').value,
+        paketId: document.getElementById('paket').value,
+        paketNama: paketOption.text.split(' - ')[0],
+        harga: parseInt(paketOption.dataset.harga),
+        tanggal: document.getElementById('tanggal').value,
+        jam: document.getElementById('jam').value,
+        status: 'Menunggu',
+        timestamp: Date.now()
+      };
+
+      await push(ref(db, 'booking/'), bookingData);
+      const hasil = document.getElementById('hasilBooking');
+      hasil.innerHTML = `Booking Berhasil! <br>Kode Booking: <b class="text-xl">${kode}</b><br>Simpan kode ini & tunjukkan ke kasir. <br><a href="cekstatus.html" class="text-blue-600 underline">Cek Status Sekarang</a>`;
+      hasil.classList.remove('hidden');
+      e.target.reset();
+      window.scrollTo({ top: hasil.offsetTop - 100, behavior: 'smooth' });
+    });
+
+    document.getElementById('tanggal').min = new Date().toISOString().split('T')[0];
+  </script>
+</body>
+</html>
